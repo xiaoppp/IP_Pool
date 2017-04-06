@@ -1,0 +1,28 @@
+{
+  "name": "proxy_pool",
+  "version": "0.0.0",
+  "description": "",
+  "devDependencies": {
+    "ava": "^0.18.2",
+    "nodemon": "^1.9.2",
+    "supertest": "^3.0.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "cheerio": "^0.22.0",
+    "moment": "^2.13.0",
+    "redis": "^2.6.2",
+    "request": "^2.74.0",
+    "request-promise": "^4.2.0",
+    "restify": "^4.1.1",
+    "retry": "^0.10.0",
+    "sequelize": "^3.23.3",
+    "streamifier": "^0.1.1",
+    "superagent": "^3.5.0",
+    "superagent-charset": "^1.1.1",
+    "superagent-proxy": "^1.0.2"
+  },
+  "scripts": {
+    "start": "nodemon ./server/app.js"
+  }
+}
