@@ -1,8 +1,8 @@
 // 抓取西刺代理 http://api.xicidaili.com/free2016.txt
 
-const request = require('request-promise-native');
+const request = require('superagent');
 const cheerio = require('cheerio')
-const Address = require('./address')
+const Address = require('./Address')
 
 async function proxy() {
     const urls = [

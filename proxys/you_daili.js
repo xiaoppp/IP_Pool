@@ -1,8 +1,8 @@
 // 抓取有代理 http://www.youdaili.net/Daili/http/
 
-const request = require('request-promise-native');
+const request = require('superagent');
 const cheerio = require('cheerio')
-const Address = require('./address')
+const Address = require('./Address')
 const addresses = []
 
 async function get_urls() {

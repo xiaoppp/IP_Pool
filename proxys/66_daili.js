@@ -1,6 +1,6 @@
-const request = require('request-promise-native');
+const request = require('superagent');
 const cheerio = require('cheerio')
-const Address = require('./address')
+const Address = require('./Address')
 
 // 抓取代理66 http://www.66ip.cn/
 async function proxy(proxy_number=100) {

@@ -6,7 +6,7 @@ const proxy1 = require('./proxys/66_daili')
 const proxy2 = require('./proxys/xici_daili')
 const proxy3 = require('./proxys/you_daili')
 
-const client = require('../redis/redisProxyPool')
+const client = require('./redisProxyPool')
 const moment = require('moment')
 
 const request = require('superagent')
@@ -42,11 +42,9 @@ async function getProxy() {
     let loop = true
     while(loop) {
         proxy = await retryProxy()
-        console.log("proxy: ", proxy)
-
         if (proxy)
             loop = false
-        // console.log("proxy: ", proxy)
+        console.log("proxy: ", proxy)
     }
     return proxy
 }
@@ -104,27 +102,6 @@ function check(proxy, d=true) {
     })
 }
 
-
-// Note: this is another way to use request replace superagent
-// function checkProxy(address) {
-//     const proxy = `http://${address.IP}:${address.port}`
-//     console.log(proxy)
-//     let options = {
-//         url: 'http://www.baidu.com/',
-//         timeout: 30000,
-//         proxy: proxy
-//     }
-//     request.get(options, function(err, res, body) {
-//         if (err || res.statusCode != 200) {
-//             console.log(err)
-//         }
-//         else {
-//             console.log('set proxy to redis')
-//             client.set(proxy, moment().unix())
-//         }
-//     })
-// }
-
 module.exports = {
     // check all proxies in pool
     checkProxy,
@@ -132,9 +109,4 @@ module.exports = {
     getProxy,
     // get all proxies from website and check if valid then push to redis pool
     scheduleProxy
-}
-
-if (require.main === module) {
-    checkProxy()
-        .then(proxy => console.log(proxy))
 }
