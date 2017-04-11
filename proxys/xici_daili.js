@@ -3,6 +3,7 @@
 const request = require('superagent');
 const cheerio = require('cheerio')
 const Address = require('./Address')
+const header = require('../header')
 
 async function proxy() {
     const urls = [
@@ -12,7 +13,11 @@ async function proxy() {
 
     const addresses = []
     for (let url of urls) {
-        const html = await request.get(url)
+        const data = await request
+                            .get(url)
+                            .set(header)
+
+        const html = data.text
         const parser = cheerio.load(html)
 
         parser('#ip_list tr')

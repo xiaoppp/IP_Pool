@@ -1,14 +1,19 @@
+// http://www.kxdaili.com/dailiip/1/2.html#ip
+
 const request = require('superagent');
 const cheerio = require('cheerio')
 const Address = require('./Address')
+const header = require('../header')
 
-// 抓取代理66 http://www.66ip.cn/
-async function proxy(pages=50) {
+// 抓取开心 http://www.kxdaili.com/
+async function proxy(pages=1) {
     let list = []
     for (let i = 0; i < pages; i++) {
-        const url = `http://m.66ip.cn/mo.php?sxb=&tqsl={}&port=&export=&ktip=&sxa=&submit=%CC%E1++%C8%A1&textarea=${i}`
-        const data = await request.get(url)
+        const url = `http://www.kxdaili.com/dailiip/1/${i}.html#ip`
+        console.log(url)
+        const data = await request.get(url).set(header)
         const html = data.text
+        console.log(html)
         const matchs = html.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}/g)
         if (matchs) {
             matchs.map(m => {

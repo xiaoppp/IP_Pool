@@ -8,41 +8,20 @@ const proxy3 = require('./proxys/you_daili')
 
 const client = require('./redisProxyPool')
 const moment = require('moment')
+const header = require('./header')
 
 const request = require('superagent')
 const agent_proxy = require('superagent-proxy')
 agent_proxy(request)
 
-async function retryProxy() {
-    const proxy = await client.randomkeyAsync()
-    console.log("retry proxy", proxy)
-    return new Promise((resolve, reject) => {
-        request
-            .get('http://www.taobao.com/')
-            .timeout({
-                response: 3 * 1000,  // Wait 3 seconds for the server to start sending,
-                deadline: 3 * 1000, // but allow 3 seconds for the file to finish loading.
-            })
-            .proxy(proxy)
-            .end(function(err, res) {
-                if (err || res.status != 200) {
-                    console.log(err)
-                    client.del(proxy)
-                    resolve(false)
-                }
-                else {
-                    console.log("get proxy: ", proxy)
-                    resolve(proxy)
-                }
-            })
-    })
-}
-
 async function getProxy() {
     let loop = true
+    let proxy = null
+
     while(loop) {
-        proxy = await retryProxy()
-        if (proxy)
+        proxy = await client.randomkeyAsync()
+        const ret = await check(proxy, true)
+        if (ret)
             loop = false
         console.log("proxy: ", proxy)
     }
@@ -52,19 +31,20 @@ async function getProxy() {
 async function scheduleProxy() {
     let address1 = await proxy1()
     console.log("address1", address1.length)
-    let address2 = await proxy2()
-    console.log("address2", address2.length)
-    let address3 = await proxy3()
-    console.log("address3", address3.length)
-
     address1.map(add => {
         const proxy = `http://${add.IP}:${add.port}`
         check(proxy, false)
     })
+
+    let address2 = await proxy2()
+    console.log("address2", address2.length)
     address2.map(add => {
         const proxy = `http://${add.IP}:${add.port}`
         check(proxy, false)
     })
+
+    let address3 = await proxy3()
+    console.log("address3", address3.length)
     address3.map(add => {
         const proxy = `http://${add.IP}:${add.port}`
         check(proxy, false)
@@ -80,25 +60,29 @@ async function checkProxy() {
     return 'done'
 }
 
-function check(proxy, d=true) {
+async function check(proxy, d=true, timeout=10) {
     console.log(proxy)
-    request
-        .get('http://www.taobao.com/')
-        .timeout({
-            response: 30 * 1000,  // Wait 5 seconds for the server to start sending,
-            deadline: 30 * 1000, // but allow 10 seconds for the file to finish loading.
+    return new Promise((resolve, reject) => {
+        request
+            .get('http://taobao.com')
+            .timeout({
+                response: timeout * 1000,  // Wait 10 seconds for the server to start sending,
+                deadline: timeout * 1000, // but allow 10 seconds for the file to finish loading.
+            })
+            .set(header)
+            .proxy(proxy)
+            .end(function(err, res) {
+                console.log("err", err)
+                if (res && res.status == 200 && res.text.indexOf('kissy') != -1) {
+                    client.set(proxy, moment().unix())
+                    resolve(proxy)
+                }
+                else {
+                    if (d)
+                        client.del(proxy)
+                    resolve(false)
+                }
         })
-        .proxy(proxy)
-        .end(function(err, res) {
-            if (err || res.status != 200) {
-                console.log(err)
-                if (d)
-                    client.del(proxy)
-                return
-            }
-            console.log(proxy)
-            console.log("proxy status code: ", res.status)
-            client.set(proxy, moment().unix())
     })
 }
 

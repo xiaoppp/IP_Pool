@@ -6,7 +6,8 @@ const Address = require('./Address')
 const addresses = []
 
 async function get_urls() {
-    const html = await request.get("http://www.youdaili.net/Daili/http/")
+    const data = await request.get("http://www.youdaili.net/Daili/http/")
+    const html = data.text
     const parser = cheerio.load(html)
     let list = []
     parser(".chunlist ul li p a")
@@ -18,7 +19,8 @@ async function get_urls() {
 }
 
 async function get_proxy_url(url) {
-    const html = await request.get(url)
+    const data = await request.get(url)
+    const html = data.text
     const matchs = html.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}/g)
 
     matchs.map(m => {
